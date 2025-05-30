@@ -101,6 +101,8 @@ class Scanner:
             return self.identifier()
         elif c.isdigit():
             return self.number()
+        elif c in ["\n", " "]:
+            return self.scan_token()
         else:
             return self.error_token(f"Unexpected character: {c}")
 
@@ -118,6 +120,8 @@ class Scanner:
             "let": TokenKind.LET,
             "const": TokenKind.CONST,
             "fn": TokenKind.FN,
+            "true": TokenKind.TRUE,
+            "false": TokenKind.FALSE,
         }.get(self.source[self.start : self.current], TokenKind.IDENT)
 
         return self.make_token(kind)

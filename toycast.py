@@ -1,7 +1,7 @@
 # the ast for toyc
 from dataclasses import dataclass
 from abc import ABC
-from typing import Dict, Iterator, List, Optional
+from typing import Dict, Iterator, List, Optional, Union
 
 @dataclass(slots=True)
 class AstNode(ABC):
@@ -46,15 +46,15 @@ class VarDecl(Stmt):
     value: Expr
     
 @dataclass(slots=True)
-class Assign(Stmt):
-    name: str
-    value: Expr
+class Assign(Expr, Stmt):
+    left: Expr
+    right: Expr
     
 @dataclass(slots=True)
 class If(Stmt):
     condition: Expr
-    then_stmt: Stmt
-    else_stmt: Optional[Stmt]
+    then_branch: Block
+    else_branch: Optional[Union[Block, 'If']]
     
 @dataclass(slots=True)
 class Goto(Stmt):
@@ -69,8 +69,12 @@ class Return(Stmt):
     value: Optional[Expr]
     
 @dataclass(slots=True)
+class ExprStmt(Stmt):
+    expr: Expr
+    
+@dataclass(slots=True)
 class Call(Expr):
-    callee: str
+    callee: Expr
     args: List[Expr]
     
 @dataclass(slots=True)
