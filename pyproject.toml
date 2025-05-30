@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "toyc"
+version = "0.1.0"
+description = "A toy compiler for a toy language"
+authors = ["Liam Eckert <liameckert17@gmail.com>"]
+readme = "README.md"
+license = "Apache-2.0"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
