@@ -10,6 +10,9 @@ class TokenKind(Enum):
     FALSE = auto()
 
     # Keywords
+    LET = auto()
+    CONST = auto()
+    FN = auto()
     IF = auto()
     ELSE = auto()
     GOTO = auto()
@@ -40,6 +43,7 @@ class TokenKind(Enum):
     RBRACE = auto()
     SEMICOLON = auto()
     COLON = auto()
+    COMMA = auto()
 
     # End of file
     EOF = auto()

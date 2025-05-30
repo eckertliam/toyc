@@ -83,18 +83,20 @@ class Scanner:
             return self.branch_token("=", TokenKind.LTEQ, TokenKind.LT)
         elif c == ">":
             return self.branch_token("=", TokenKind.GTEQ, TokenKind.GT)
+        elif c == ",":
+            return self.make_token(TokenKind.COMMA)
         elif c == "&":
             if self.peek() == "&":
                 self.advance()
                 return self.make_token(TokenKind.AMPAMP)
             else:
-                return self.scan_token()
+                return self.error_token("Expected `&&`")
         elif c == "|":
             if self.peek() == "|":
                 self.advance()
                 return self.make_token(TokenKind.PIPEPIPE)
             else:
-                return self.scan_token()
+                return self.error_token("Expected `||`")
         elif c.isalpha() or c == "_":
             return self.identifier()
         elif c.isdigit():
@@ -113,6 +115,9 @@ class Scanner:
             "goto": TokenKind.GOTO,
             "label": TokenKind.LABEL,
             "return": TokenKind.RETURN,
+            "let": TokenKind.LET,
+            "const": TokenKind.CONST,
+            "fn": TokenKind.FN,
         }.get(self.source[self.start : self.current], TokenKind.IDENT)
 
         return self.make_token(kind)
