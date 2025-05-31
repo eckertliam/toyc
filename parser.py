@@ -36,7 +36,7 @@ class ParseError(Exception):
 class Parser:
     def __init__(self, tokens: Iterator[Token]) -> None:
         self.tokens: Iterator[Token] = tokens
-        self.previous: Token = next(self.tokens)
+        self.previous: Token = Token(TokenKind.EOF, "", 0)
         self.current: Token = next(self.tokens)
         self.errors: List[ParseError] = []
 

@@ -32,6 +32,8 @@ class MirBuilder:
     def lower_function(self, function: FnDecl) -> None:
         # create a new function
         self.current_function = Function(function.name, {}, {}, function.return_type)
+        # add the function to the module
+        self.module.functions[function.name] = self.current_function
         # add the function params to the function
         for param in function.params:
             # this is easy because the types are just string for now
