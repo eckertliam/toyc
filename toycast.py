@@ -16,7 +16,7 @@ class Expr(AstNode):
     pass
 
 @dataclass(slots=True)
-class Block(AstNode):
+class Body(AstNode):
     statements: List[Stmt]
     
     def __iter__(self) -> Iterator[Stmt]:
@@ -32,10 +32,11 @@ class FnDecl(AstNode):
     name: str
     params: List[Param]
     return_type: str
-    body: Block
+    body: Body
 
 @dataclass(slots=True)
 class Program(AstNode):
+    name: str
     functions: List[FnDecl]
     
 @dataclass(slots=True)
@@ -53,8 +54,8 @@ class Assign(Expr, Stmt):
 @dataclass(slots=True)
 class If(Stmt):
     condition: Expr
-    then_branch: Block
-    else_branch: Optional[Union[Block, 'If']]
+    then_branch: Body
+    else_branch: Optional[Union[Body, 'If']]
     
 @dataclass(slots=True)
 class Goto(Stmt):

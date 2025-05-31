@@ -1,9 +1,8 @@
-from collections import deque
-from typing import Deque, Iterator, List
+from typing import Iterator, List
 from tokens import Token, TokenKind
 from toycast import (
     Assign,
-    Block,
+    Body,
     BoolLit,
     Expr,
     ExprStmt,
@@ -119,7 +118,7 @@ class Parser:
             return True
         return False
 
-    def parse_program(self) -> Program:
+    def parse_program(self, name: str) -> Program:
         functions = []
         while self.current.kind != TokenKind.EOF:
             try:
@@ -136,7 +135,7 @@ class Parser:
             for error in self.errors:
                 print(error)
 
-        return Program(line=1, functions=functions)
+        return Program(1, name, functions)
 
     def parse_function(self) -> FnDecl:
         # Assume function declaration looks like: fn name(param: type, ...): type { ... }
@@ -160,7 +159,7 @@ class Parser:
             name_token.line, name_token.lexeme, params, return_type_token.lexeme, body
         )
 
-    def parse_block(self) -> Block:
+    def parse_block(self) -> Body:
         self.expect(TokenKind.LBRACE, "Expected '{' to start block")
         statements = []
         while not self.match(TokenKind.RBRACE, TokenKind.EOF):
@@ -182,7 +181,7 @@ class Parser:
                 )
                 continue
         self.expect(TokenKind.RBRACE, "Expected '}' to end block")
-        return Block(self.previous.line, statements)
+        return Body(self.previous.line, statements)
 
     def parse_stmt(self) -> Stmt:
         if self.match_consume(TokenKind.LET):

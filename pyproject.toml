@@ -8,6 +8,7 @@ license = "Apache-2.0"
 
 [tool.poetry.dependencies]
 python = "^3.12"
+llvmlite = "^0.44.0"
 
 
 [build-system]
