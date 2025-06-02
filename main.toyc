@@ -1,7 +1,11 @@
-fn add(a: i32, b: i32): i32 {
-    return a + b;
-}
-
 fn main(): i32 {
-    return add(1, 2);
+    let a: i32 = 1;
+
+    label loop:
+        if a < 10 {
+            a = a + 1;
+            goto loop;
+        }
+
+    return a;
 }

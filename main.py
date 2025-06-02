@@ -4,7 +4,6 @@ import sys
 import os
 from scanner import Scanner
 from parser import Parser
-from mir_builder import MirBuilder
 from codegen import LLVMCodeGen
 import llvmlite.binding as llvm
 import subprocess
@@ -16,10 +15,8 @@ def compile_source(src: str, prog_name: str):
     tokens = iter(scanner)
     parser = Parser(tokens)
     ast = parser.parse_program(prog_name)
-    # Lower to MIR
-    mir_mod = MirBuilder().lower(ast)
     # Lower to LLVM IR
-    llvm_mod = LLVMCodeGen().lower(mir_mod)
+    llvm_mod = LLVMCodeGen().lower(ast)
     return llvm_mod
 
 # AOT compilation: emit object and link to native executable
@@ -68,27 +65,34 @@ def main():
         print(f"Compilation error: {e}", file=sys.stderr)
         sys.exit(1)
 
-    # Convert to LLVM IR text
+    # convert to LLVM IR text
     ir_text = str(llvm_mod)
     if args.jit:
-        # JIT execution path
+        # jit execution path
+        # initialize LLVM backends
         llvm.initialize()
         llvm.initialize_native_target()
         llvm.initialize_native_asmprinter()
+        # parse and verify IR
         mod = llvm.parse_assembly(ir_text)
         mod.verify()
+        # create target machine and engine
         target = llvm.Target.from_default_triple()
         tm = target.create_target_machine()
+        # create MCJIT compiler
         engine = llvm.create_mcjit_compiler(mod, tm)
+        # finalize object
         engine.finalize_object()
-        # get pointer to 'main'
+        # get pointer to 'main' function
         ptr = engine.get_function_address(prog_name)
+        # create ctypes function pointer
         from ctypes import CFUNCTYPE, c_int
         cfunc = CFUNCTYPE(c_int)(ptr)
+        # call function and print result
         result = cfunc()
         print(f"JIT returned: {result}")
     else:
-        # AOT compile: emit object and link to native executable
+        # aot compile: emit object and link to native executable
         exe_path = args.output if args.output else prog_name
         obj_path = exe_path + ".o"
         try:
