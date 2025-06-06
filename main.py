@@ -2,11 +2,12 @@
 import argparse
 import sys
 import os
-from scanner import Scanner
-from parser import Parser
-from codegen import LLVMCodeGen
+from toyc.scanner import Scanner
+from toyc.parser import Parser
+from toyc.codegen import LLVMCodeGen
 import llvmlite.binding as llvm
 import subprocess
+
 
 def compile_source(src: str, prog_name: str):
     # compile the source to LLVM IR
@@ -18,6 +19,7 @@ def compile_source(src: str, prog_name: str):
     # Lower to LLVM IR
     llvm_mod = LLVMCodeGen().lower(ast)
     return llvm_mod
+
 
 # AOT compilation: emit object and link to native executable
 def aot_compile(llvm_ir: str, obj_path: str, exe_path: str):
@@ -36,22 +38,29 @@ def aot_compile(llvm_ir: str, obj_path: str, exe_path: str):
 
     # Emit object file
     obj_bytes = tm.emit_object(mod)
-    with open(obj_path, 'wb') as f:
+    with open(obj_path, "wb") as f:
         f.write(obj_bytes)
 
     # Link into executable (uses system clang)
-    subprocess.run(['clang', obj_path, '-o', exe_path], check=True)
+    subprocess.run(["clang", obj_path, "-o", exe_path], check=True)
+
 
 def main():
-    argp = argparse.ArgumentParser(description="ToyC compiler: .toyc -> native executable (AOT) or JIT execution")
+    argp = argparse.ArgumentParser(
+        description="ToyC compiler: .toyc -> native executable (AOT) or JIT execution"
+    )
     argp.add_argument("input", help="Input .toyc source file")
-    argp.add_argument("-o", "--output", help="Output executable path, default <input basename>")
-    argp.add_argument("--jit", action="store_true", help="JIT-execute the generated IR instead of AOT")
+    argp.add_argument(
+        "-o", "--output", help="Output executable path, default <input basename>"
+    )
+    argp.add_argument(
+        "--jit", action="store_true", help="JIT-execute the generated IR instead of AOT"
+    )
     args = argp.parse_args()
 
     # Read input file
     try:
-        with open(args.input, 'r') as f:
+        with open(args.input, "r") as f:
             src = f.read()
     except IOError as e:
         print(f"Error reading {args.input}: {e}", file=sys.stderr)
@@ -87,6 +96,7 @@ def main():
         ptr = engine.get_function_address(prog_name)
         # create ctypes function pointer
         from ctypes import CFUNCTYPE, c_int
+
         cfunc = CFUNCTYPE(c_int)(ptr)
         # call function and print result
         result = cfunc()
@@ -102,5 +112,6 @@ def main():
             sys.exit(1)
         print(f"Generated executable: {exe_path}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

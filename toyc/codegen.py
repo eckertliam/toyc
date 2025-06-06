@@ -1,6 +1,6 @@
 from llvmlite import ir
 from typing import Dict
-import toycast as tc
+import toyc.toycast as tc
 
 
 class LLVMCodeGen:
@@ -119,7 +119,9 @@ class LLVMCodeGen:
             return self.builder.load(ptr)
         elif isinstance(expr, tc.Assign):
             # handle assignment expression: store RHS into LHS and return the RHS value
-            assert isinstance(expr.left, tc.Ident), "Only simple Ident LHS assignments supported"
+            assert isinstance(
+                expr.left, tc.Ident
+            ), "Only simple Ident LHS assignments supported"
             ptr = self.reg_map[expr.left.name]
             val = self.lower_expr(expr.right)
             self.builder.store(val, ptr)
@@ -173,13 +175,13 @@ class LLVMCodeGen:
         # integer negation: -x
         if unary.op == "-":
             # if operand is float or double, use fneg; for integers, use neg
-            if isinstance(operand_val.type, ir.IntType): # type: ignore
+            if isinstance(operand_val.type, ir.IntType):  # type: ignore
                 return self.builder.neg(operand_val)  # type: ignore
             else:
                 return self.builder.fneg(operand_val)  # type: ignore
         # boolean negation: !x (i.e., x == 0 yields true)
         elif unary.op == "!":
-            zero = ir.Constant(operand_val.type, 0) # type: ignore
+            zero = ir.Constant(operand_val.type, 0)  # type: ignore
             return self.builder.icmp_signed("==", operand_val, zero)
         else:
             raise NotImplementedError(f"Unknown unary operator: {unary.op}")

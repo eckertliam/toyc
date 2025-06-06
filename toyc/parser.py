@@ -1,6 +1,6 @@
 from typing import Iterator, List
-from tokens import Token, TokenKind
-from toycast import (
+from toyc.tokens import Token, TokenKind
+from toyc.toycast import (
     Assign,
     Body,
     BoolLit,
@@ -18,9 +18,7 @@ from toycast import (
     Unary,
     VarDecl,
 )
-from toycast import IntLit, Ident, Binary, Call
-
-# TODO: support for boolean literals
+from toyc.toycast import IntLit, Ident, Binary, Call
 
 
 class ParseError(Exception):
@@ -148,7 +146,9 @@ class Parser:
                 param_name = self.expect(TokenKind.IDENT, "Expected parameter name")
                 self.expect(TokenKind.COLON, "Expected ':' after parameter name")
                 param_type = self.expect(TokenKind.IDENT, "Expected parameter type")
-                params.append(Param(param_name.line, param_name.lexeme, param_type.lexeme))
+                params.append(
+                    Param(param_name.line, param_name.lexeme, param_type.lexeme)
+                )
                 if not self.match_consume(TokenKind.COMMA):
                     break
         self.expect(TokenKind.RPAREN, "Expected ')' after parameters")
@@ -253,15 +253,17 @@ class Parser:
 
     def parse_number(self, token: Token) -> Expr:
         try:
-            if '.' in token.lexeme:
+            if "." in token.lexeme:
                 return FloatLit(token.line, float(token.lexeme))
             return IntLit(token.line, int(token.lexeme))
         except ValueError:
-            raise ParseError(f"Invalid numeric literal: {token.lexeme}", token.line, token.lexeme)
+            raise ParseError(
+                f"Invalid numeric literal: {token.lexeme}", token.line, token.lexeme
+            )
 
     def parse_identifier(self, token: Token) -> Expr:
         return Ident(token.line, token.lexeme)
-    
+
     def parse_bool(self, token: Token) -> Expr:
         return BoolLit(token.line, token.lexeme == "true")
 
@@ -275,11 +277,11 @@ class Parser:
             # Right-associative for assignment
             right = self.parse_expr(self.precedences[token.kind] - 1)
             return Assign(left.line, left, right)
-        
+
         precedence = self.precedences[token.kind]
         right = self.parse_expr(precedence)
         return Binary(token.line, left, token.lexeme, right)
-    
+
     def parse_call(self, callee: Expr, token: Token) -> Expr:
         args: List[Expr] = []
         if not self.match(TokenKind.RPAREN):
@@ -289,7 +291,7 @@ class Parser:
                     break
         self.expect(TokenKind.RPAREN, "Expected ')' after function arguments")
         return Call(token.line, callee, args)
-    
+
     def parse_unary(self, token: Token) -> Expr:
         operand = self.parse_expr(9)
         return Unary(token.line, token.lexeme, operand)

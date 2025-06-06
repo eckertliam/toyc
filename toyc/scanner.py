@@ -1,4 +1,4 @@
-from tokens import Token, TokenKind
+from toyc.tokens import Token, TokenKind
 from typing import Iterator
 
 
@@ -11,9 +11,6 @@ class Scanner:
         self.current = 0
 
     def __iter__(self) -> Iterator[Token]:
-        return self.tokenize()
-
-    def tokenize(self) -> Iterator[Token]:
         while not self.is_at_end():
             yield self.scan_token()
         yield Token(TokenKind.EOF, "", self.line)
@@ -27,23 +24,32 @@ class Scanner:
         return self.source[self.current]
 
     def advance(self) -> str:
+        # grab the current character
         char = self.source[self.current]
+        # increment the current position
         self.current += 1
+        # if the character is a newline, increment the line number
         if char == "\n":
             self.line += 1
+        # return the character
         return char
 
     def make_token(self, kind: TokenKind) -> Token:
+        # grab the lexeme from the source code
         lexeme = self.source[self.start : self.current]
+        # return the token with the kind, lexeme, and line number
         return Token(kind, lexeme, self.line)
 
     def branch_token(
         self, if_char: str, then_kind: TokenKind, else_kind: TokenKind
     ) -> Token:
+        # check if the next character matches the expected character
         if self.peek() == if_char:
+            # if so skip over it and return the then kind
             self.advance()
             return self.make_token(then_kind)
         else:
+            # otherwise return the else kind
             return self.make_token(else_kind)
 
     def error_token(self, message: str) -> Token:
