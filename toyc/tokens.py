@@ -25,9 +25,9 @@ class TokenKind(Enum):
 
     The members roughly follow three conceptual groups:
 
-    * **Literals & identifiers** – user‑authored data like numbers and names.
-    * **Keywords & operators** – reserved language terms and arithmetic/logic symbols.
-    * **Punctuation & control** – structural delimiters plus EOF and error sentinels.
+    * Literals & identifiers – user‑authored data like numbers and names.
+    * Keywords & operators – reserved language terms and arithmetic/logic symbols.
+    * Punctuation & control – structural delimiters plus EOF and error sentinels.
     """
 
     # Literals
@@ -94,3 +94,6 @@ class Token:
     kind: TokenKind
     lexeme: str
     line: int
+
+    def __repr__(self) -> str:
+        return f"Token(kind={self.kind.name}, lexeme={self.lexeme}, line={self.line})"

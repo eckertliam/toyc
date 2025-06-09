@@ -117,8 +117,14 @@ class Scanner:
         """Return an error `Token` carrying *message*."""
         return Token(TokenKind.ERROR, message, self.line)
 
+    def skip_whitespace(self) -> None:
+        """Skip whitespace characters."""
+        while self.peek() in " \t\n\r":
+            self.advance()
+
     def scan_token(self) -> Token:
         """Scan and return the next `Token` from the source."""
+        self.skip_whitespace()
         self.start = self.current
         c = self.advance()
 
@@ -129,10 +135,10 @@ class Scanner:
 
         # check if c is a branching token
         if c in self.branch_tokens:
-            # unpack the match, then, else
-            match, then_kind, else_kind = self.branch_tokens[c]
+            # unpack the match_char, then, else
+            match_char, then_kind, else_kind = self.branch_tokens[c]
             # check if the next character matches the match
-            if self.peek() == match:
+            if self.peek() == match_char:
                 # if so skip over it and return the then kind
                 self.advance()
                 return self.make_token(then_kind)
