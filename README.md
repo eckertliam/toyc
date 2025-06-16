@@ -27,8 +27,8 @@ ToyC is a simple, educational compiler for a C‑inspired toy language, implemen
 
 1. **Clone the repository**  
    ```bash
-   git clone https://github.com/YourUsername/ToyC.git
-   cd ToyC
+   git clone https://github.com/YourUsername/toyc.git
+   cd toyc
    ```
 
 2. **Create a virtual environment (recommended)**  
